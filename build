@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+var mkdirp = require('mkdirp');
+var fs = require('fs');
+var swig = require('swig');
+var path = require('path');
+var RSS = require('rss');
+
+var postList = require('./post_list');
+
+var VIEWS_DIR = "views";
+var BUILD_DIR = "www";
+
+var RSS_MAX_COUNT = 10;
+
+mkdirp.sync(BUILD_DIR);
+
+readPostContentAndGenerateRss();
+
+render("index.html", "home", {posts: postList});
+postList.forEach(function(post) {
+  render(path.join("post", post.filename), "post", {post: post});
+});
+
+function render(file, viewName, context) {
+  var template = swig.compileFile(path.join(VIEWS_DIR, viewName + ".html"));
+  var html = template(context);
+  var fullPath = path.join(BUILD_DIR, file);
+  mkdirp.sync(path.dirname(fullPath));
+  fs.writeFileSync(fullPath, html);
+}
+
+function readPostContentAndGenerateRss() {
+  // cache the file content for each post in memory
+  // also create a list of posts ordered by date
+  // also create the RSS feed
+  var feed = new RSS({
+    title: "Genesis Digital Audio Workstation",
+    description: "Development Blog",
+    feed_url: "http://genesisdaw.org/rss.xml",
+    site_url: "http://genesisdaw.org/",
+    //image_url: "https://s3.amazonaws.com/superjoe/blog-files/profile-48x58.jpg",
+    author: "Andrew Kelley",
+  });
+  postList.forEach(function(post, i) {
+    post.content = fs.readFileSync(path.join("posts", post.filename), {encoding: 'utf8'});
+    if (i < RSS_MAX_COUNT) {
+      feed.item({
+        title: post.title,
+        description: post.content,
+        url: "http://genesisdaw.org/post/" + post.filename,
+        date: post.date,
+      });
+    }
+  });
+  fs.writeFileSync(path.join(BUILD_DIR, "rss.xml"), feed.xml());
+}

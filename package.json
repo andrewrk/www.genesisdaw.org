@@ -1,0 +1,18 @@
+{
+  "name": "genesisdaw.org",
+  "private": true,
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/andrewrk/www.genesisdaw.org.git"
+  },
+  "author": "Andrew Kelley <superjoe30@gmail.com>",
+  "dependencies": {
+    "mkdirp": "~0.5.0",
+    "rss": "~1.1.1",
+    "s3-cli": "~0.11.1",
+    "swig": "~1.4.2"
+  }
+}
