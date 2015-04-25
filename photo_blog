@@ -47,8 +47,10 @@ function main(caption) {
     });
     fs.writeFileSync("post_list.json", JSON.stringify(postList, null, 2));
     exec("./build", [], function() {
-
-      // TODO: git commit, git push, push
+      exec("git", ["add", "-A"], function() {
+        exec("git", ["commit", "-m", "add screenshot: " + title], function() {
+        });
+      });
     })
   });
 }
@@ -71,7 +73,7 @@ function urlify(str) {
 }
 
 function exec(cmd, args, cb) {
-  process.stderr.write(cmd + " " + args.join(" "));
+  console.error(cmd + " " + args.join(" "));
   var child = spawn(cmd, args, {stdio: 'inherit'});
   child.on('error', function(err) {
     throw err;
