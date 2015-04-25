@@ -9,5 +9,17 @@
 {% autoescape false %}
 {{ post.content }}
 {% endautoescape %}
-<p><a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a></p>
+<p>
+<a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a>
+</p>
+{% if post.prev %}
+<p>
+Previous Post: <a href="{{post.prev.filename}}">{{ post.prev.title }}</a>
+</p>
+{% endif %}
+{% if post.next %}
+<p>
+Next Post: <a href="{{post.next.filename}}">{{ post.next.title }}</a>
+</p>
+{% endif %}
 {% endblock %}

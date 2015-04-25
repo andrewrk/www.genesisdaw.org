@@ -34,5 +34,11 @@
     "content": null,
     "date": "2015-03-27T21:29:02.702Z",
     "title": "Thread Safe Lock Free Queue Implementation"
+  },
+  {
+    "filename": "basic-synth-midi-keyboard.html",
+    "content": null,
+    "date": "2015-03-30T21:29:02.702Z",
+    "title": "Milestone: Basic Synth and MIDI Keyboard Support"
   }
 ]

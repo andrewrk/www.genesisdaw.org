@@ -18,6 +18,14 @@ mkdirp.sync(BUILD_DIR);
 readPostContentAndGenerateRss();
 
 render("index.html", "home", {posts: postList});
+var prev = null;
+postList.forEach(function(post) {
+  if (prev) {
+    post.next = prev;
+    prev.prev = post;
+  }
+  prev = post;
+});
 postList.forEach(function(post) {
   render(path.join("post", post.filename), "post", {post: post});
 });
