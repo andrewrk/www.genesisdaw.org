@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+
+var StreamSink = require('streamsink');
+var fs = require('fs');
+var diacritics = require('diacritics');
+var spawn = require('child_process');
+var MAX_LENGTH = 64;
+
+var postList = require("./post_list.json");
+
+var title = process.argv[3];
+if (!title) throw new Error("missing title");
+var input_filename = process.argv[2];
+if (!input_filename) throw new Error("missing input filename");
+var output_filename = urlify(title);
+
+if (process.argv[4]) throw new Error("extra args");
+
+fs.statSync(input_filename);
+
+var sink = new StreamSink();
+sink.on('finish', function() {
+  main(sink.toString('utf8'));
+});
+process.stdin.pipe(sink);
+
+function main(caption) {
+  var args = ["put", "--acl-public", input_filename, "s3://genesisdaw.org/img/" + output_filename + ".png"];
+  exec("./node_modules/.bin/s3-cli", args, function() {
+    var postFileName= "posts/" + output_filename + ".html";
+    if (fs.existsSync(postFileName)) {
+      throw new Error("post already exists");
+    }
+    fs.writeFileSync(postFileName,
+      "<img alt=\"\" src=\"https://s3.amazonaws.com/genesisdaw.org/img/" + output_filename + "\">\n" +
+      "<p>" + caption + "</p>\n");
+    postList.push({
+        "filename": output_filename + ".html",
+        "content": null,
+        "date": new Date(),
+        "title": title
+    });
+    fs.writeFileSync("post_list.json", JSON.stringify(postList, null, 2));
+    // TODO: git commit, git push, push
+  });
+}
+
+function urlify(str) {
+  str = str.toLowerCase().trim();
+  str = diacritics.remove(str);
+  str = str.replace(/[^a-zA-Z0-9\-]/g, '-');
+  var old_len = str.length;
+  var new_len = -1;
+  while (old_len !== new_len) {
+    old_len = str.length;
+    str = str.replace(/--/g, '-');
+    new_len = str.length;
+  }
+  str = str.substring(0, MAX_LENGTH);
+  str = str.replace(/^-/, '');
+  str = str.replace(/-$/, '');
+  return str;
+}
+
+function exec(cmd, args, cb) {
+  var child = spawn(cmd, args);
+  child.on('error', function(err) {
+    throw err;
+  });
+  child.on('close', function(code) {
+    if (code !== 0) throw new Error("return code " + code);
+    cb();
+  });
+}
