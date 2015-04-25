@@ -1,8 +1,38 @@
 [
   {
+    "filename": "bit-trouper.html",
+    "content": null,
+    "date": "2013-03-13T01:38:29.400Z",
+    "title": "Bit Trouper"
+  },
+  {
     "filename": "progress-so-far.html",
     "content": null,
-    "date": "2015-04-24T17:58:23.336Z",
+    "date": "2015-02-06T18:34:36.614Z",
     "title": "Progress So Far"
+  },
+  {
+    "filename": "opening-an-audio-file.html",
+    "content": null,
+    "date": "2015-03-15T21:02:37.439Z",
+    "title": "Opening an Audio File"
+  },
+  {
+    "filename": "vaporware-grand-plans.html",
+    "content": null,
+    "date": "2015-03-16T21:15:45.818Z",
+    "title": "Vaporware Grand Plans"
+  },
+  {
+    "filename": "interesting-commits.html",
+    "content": null,
+    "date": "2015-03-26T21:29:02.702Z",
+    "title": "Interesting Commits"
+  },
+  {
+    "filename": "thread-safe-lock-free-queue.html",
+    "content": null,
+    "date": "2015-03-27T21:29:02.702Z",
+    "title": "Thread Safe Lock Free Queue Implementation"
   }
 ]

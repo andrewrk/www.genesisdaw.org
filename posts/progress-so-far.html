@@ -1,3 +1,311 @@
 <p>
-Progress so far.
+I started working on Genesis in March 2013. The first commit:
+</p>
+<pre>
+<code>
+commit 6d1699c42fce480c0b7ec84b521e088b09a3af32
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Wed Mar 13 01:38:29 2013 -0400
+
+    hello world
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..01ae3a5
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1 @@
++# Digital Audio Workstation
+diff --git a/main.go b/main.go
+new file mode 100644
+index 0000000..893d327
+--- /dev/null
++++ b/main.go
+@@ -0,0 +1,7 @@
++package main
++
++import "fmt"
++
++func main() {
++    fmt.Printf("Hello, world\n")
++}
+</code>
+</pre>
+<p>
+Yes, that's right. I thought I was going to write it in Go.
+</p>
+<p>
+This turned out to be a bad idea. Here's why:
+</p>
+<ul>
+  <li>
+    Go is garbage collected, which makes its performance characteristics less predictable -
+    a serious problem with real-time audio processing.
+  </li>
+  <li>
+    I would have to write an abstraction layer between any C libraries and Go code.
+  </li>
+  <li>
+    Other people who want to re-use Genesis library code would be forced to use Go or
+    be out of luck.
+  </li>
+</ul>
+<p>
+  Sure enough the next thing I tried to do was use a GTK Go-binding library and find it
+  broken and inadequate.
+</p>
+<p>
+  I fiddled with that for a bit and then lost enthusiasm. But I picked up the project in
+  January 2014:
+</p>
+<pre>
+<code>
+commit ff958caab890738334f660b058ded310b759206a
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Sat Jan 25 23:19:16 2014 -0500
+
+    switching to C++ and Qt. main window, does nothing
+</code>
+</pre>
+<p>
+Qt solves a lot of platform abstraction for the programmer. You might even say it solves <em>too much</em>.
+The downside is that it is a hulking behemoth of a dependency with a nontrivial build process.
+But, it enabled me to make some windows and fiddle around with some code.
+</p>
+<p>
+I added the ability to list <a href="http://lv2plug.in/">LV2 plugins</a> and open a
+<a href="http://www.portaudio.com/">PortAudio</a> stream.
+</p>
+<p>
+During this time I came up with some feature requirements:
+</p>
+<ul>
+  <li>Never require the user to restart the program.</li>
+  <li>Robust undo/redo support.</li>
+  <li>Ability to edit multiple projects at once. Copy and paste between them.</li>
+  <li>Support for N audio channels instead of hardcoded stereo.</li>
+  <li>Tight integration with an online sample/project sharing service. Make it
+      really easy to save the project open source.
+  </li>
+  <li><strong>multiplayer support</strong> - Each person can be editing a different section.</li>
+</ul>
+<p>
+  And then I lost interest for a while. I spent a lot of time working on
+  <a href="https://github.com/andrewrk/groovebasin">GrooveBasin</a>, prototyped a
+  <a href="https://www.youtube.com/watch?v=LdumpgdooMc">Grappling Hook-Based Video Game</a>,
+  and entered <a href="https://www.youtube.com/watch?v=4up9g0I7dHI">Ludum Dare 30</a>.
+</p>
+<p>
+  In November 2014, progress resumed. Well, for some definitions of progress:
+</p>
+<pre>
+<code>
+commit 8799dcb4c20758bf546ba0d7cccfb60b2c7c3d5a
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Sun Nov 2 15:49:01 2014 -0700
+
+    delete all source code
+</code>
+</pre>
+<p>And then:</p>
+<pre>
+<code>
+commit 95f2f251645548196604af9d4087d5b9e043a60a
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Sun Nov 2 16:06:47 2014 -0700
+
+    hello, rust
+
+diff --git a/src/main.rs b/src/main.rs
+new file mode 100644
+index 0000000..6686bd0
+--- /dev/null
++++ b/src/main.rs
+@@ -0,0 +1,3 @@
++fn main() {
++    println!("Hello, world!")
++}
+</code>
+</pre>
+<p>
+Rust seemed like a cool alternative to C++ because it had fancy new programming language features
+like <em>not requiring .h files</em>. More seriously, the 3 problems with using Go are resolved with
+Rust, since it can call C code directly, C code can call it, and there is no garbage collector.
+Further, the safety guarantees it made were promising.
+</p>
+<p>
+But nothing in life is free. GTK is sufficiently complicated that a Rust "safety wrapper" is in order.
+The one available was not complete.
+</p>
+<p>
+At this time I began to have a new philosophy: <em>Stop depending on libraries that hold the project down.</em>
+</p>
+<p>
+This led me to ditch the idea of using GTK or Qt and instead code the user interface toolkit from scratch.
+This would work out better anyway if I wanted to sandbox plugins and provide a user-interface API for them
+to use.
+</p>
+<pre>
+<code>
+commit e7856aad61bcdaec657832807997244eff20a528
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Fri Jan 16 08:55:19 2015 -0700
+
+    goodbye GTK, hello SDL2
+
+</code>
+</pre>
+<p>
+  Wait, never mind, let's try GLFW.
+</p>
+<pre>
+<code>
+commit 401b3c99b4849fb65616190e41dbfbe32794c6c4
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Fri Jan 16 10:10:01 2015 -0700
+
+    goodbye SDL2, hello GLFW
+
+</code>
+</pre>
+<p>
+  At this point I felt like I needed a direction, something to work towards. So I created a goal:
+</p>
+<ol>
+  <li>Open an audio file with libav.</li>
+  <li>Display the waveform of the audio file in the display.</li>
+</ol>
+<p>
+  Next I began to experience Rust development. I went back and forth between GLFW and glutin for
+  window library as one or the other seemed to be better.
+  I created <a href="https://github.com/andrewrk/groove-rs">groove-rs</a> - bindings to
+  <a href="https://github.com/andrewrk/libgroove">libgroove</a>.
+  I wrote my own
+  <a href="https://github.com/andrewrk/math3d-rs">3D math library</a> because
+  the <a href="https://github.com/sebcrozet/nalgebra">existing one</a>'s API was too hard for me to understand.
+  I fixed a lot of code after updating to the latest Rust compiler each day.
+</p>
+<p>
+  Finally, I got font rendering working. It took me 16 days, but I felt like I had learned enough
+  about Rust to finally let me develop efficiently.
+</p>
+<img alt="" src="https://s3.amazonaws.com/genesisdaw.org/img/rust-font-rendering-ok.png">
+<p>
+  And then I tried to abstract the font rendering code into a widget concept, and everything broke down.
+  The Rust compiler has many false negatives - situations where it is a compile error due to safety,
+  but actually it's pretty obvious that there are no safety problems.
+</p>
+<p>
+  This is so frustrating and demotivating that I realized the benefits of Rust did not outweigh
+  the slow development pace that I had taken on.
+</p>
+<pre>
+<code>
+commit 611d1afd7439761a1be8edb8c3f434ade0c7fcdb
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Sun Feb 1 00:42:02 2015 -0700
+
+    rust is too hard
+
+commit c45c8c32c4a2f22112c4ee15d8a42b0ad5415e89
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Mon Feb 2 18:08:44 2015 -0700
+
+    delete all code, switch to C++
+</code>
+</pre>
+<p>
+  I felt guilty for allowing myself get distracted from actually making progress all this time.
+  From now on I would be lazer focused and in general avoid depending on other people's code.
+  If it's a bug in my code, then I know how to fix it. New roadmap:
+</p>
+<ol>
+  <li>Load all the audio file's channels into memory.</li>
+  <li>Display all of the audio file's channels in a list.</li>
+  <li>Render channels graphically.</li>
+  <li>Ability to make a selection.</li>
+  <li>Playback to speakers.</li>
+  <li>Delete selection.</li>
+  <li>Undo/Redo</li>
+  <li>Multiplayer</li>
+</ol>
+<p>
+  So I knew I would be switching to C++. But I did not want to fall into the same trap in C++-land
+  that I did in Rust-land: instead of solving the actual problem of making a DAW, trying to understand
+  how Rust or C++ works and get my code to compile.
+</p>
+<p>
+  I considered switching to C instead of C++. Linus Torvalds has 
+  <a href="http://harmful.cat-v.org/software/c++/linus">some things to say about that</a>.
+</p>
+<p>
+  But some C++ features are too good to ignore, such as template data structures. For example, in C
+  if you want to create a list data structure, you have 3 options:
+</p>
+<ul>
+  <li>Make it generic using preprocessor directives.</li>
+  <li>Make it generic using <code>void *</code> instead of actual types.</li>
+  <li>Don't make it generic. Reimplement the same data structure over and over for each type.</li>
+</ul>
+<p>
+  This sucks. Preprocessor directives are the devil, Too much <code>void *</code> leads to
+  runtime memory safety errors that the compiler can't catch. And what if it wasn't a simple list
+  data structure, but instead a hash table or something? This is crazy, we can't reimplement the
+  same data structure a bunch of times.
+</p>
+<p>
+Another example. In C you use <code>malloc</code> to allocate memory. It typically looks something
+like <code>malloc(sizeof(MyType) * count)</code>. If you forget to multiply by count or sizeof, oops.
+segfault. Meanwhile if you can use templates then you can define a function like this:
+</p>
+<pre>
+<code>
+template&lt;typename T&gt;
+__attribute__((malloc)) static inline T * allocate(size_t count) {
+    return reinterpret_cast&lt;T*&gt;(malloc(count * sizeof(T)));
+}
+</code>
+</pre>
+<p>
+  Now you can't mess it up, the compiler does the work for you.
+</p>
+<p>
+So I wanted templates from C++. And <a href="http://en.cppreference.com/w/cpp/atomic/atomic">atomics</a>
+from C++11. But that's about it. Other than that, I want to code like I'm in C. The beauty of C-style
+coding is that the control flow is so simple, it's impossible to not know what code is doing. Contrast
+that with fancy C++ stuff and you never know what's going to happen or what each line of code is going
+to do.
+</p>
+<p>
+I figured out how to have my cake and eat it too. I discovered that you can compile with g++
+and link with gcc, like so:
+</p>
+<pre>
+<code>
+g++ -nodefaultlibs -fno-exceptions -fno-rtti -std=c++11 -c main.cpp -o main.o
+gcc -o main main.o
+</code>
+</pre>
+<p>
+As long as you don't use anything from the C++ standard library, you end up with working code
+that was compiled with the C++ compiler and does not depend on libstdc++.
+</p>
+<p>
+With clang it's even easier, just don't put <code>-lstdc++</code> on the linker line.
+</p>
+<p>
+So I moved on, happy with this choice of language. Over the course of <strong>4 days</strong>, I implemented,
+<em>with useful, reusable abstractions</em>:
+</p>
+<ul>
+  <li>A UTF-8 encoder/decoder and String class.</li>
+  <li>OpenGL shaders for text rendering.</li>
+  <li>A hash table implementation with robin hood hashing.</li>
+  <li>A Label graphics class to render text, which uses FreeType to load a TTF file and caches
+      rendered symbols in a hash table.
+  </li>
+</ul>
+<p>
+At this point I felt crazy for even considering Rust. I had accomplished more in 4 days what took me
+16 days in Rust. But more importantly, my abstractions were holding up.
 </p>

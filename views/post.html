@@ -3,11 +3,11 @@
 {% block title %}{{ post.title }} - {% parent %}{% endblock %}
 
 {% block content %}
-<h1><a href="../">Genesis Digital Audio Workstation</a></h1>
+<h1><a href="/">Genesis Digital Audio Workstation</a></h1>
 <h2>{{ post.title }}</h2>
 <p>{{ post.date | date("Y M d") }}</p>
 {% autoescape false %}
 {{ post.content }}
 {% endautoescape %}
+<p><a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a></p>
 {% endblock %}
-

@@ -1,0 +1,108 @@
+<pre>
+<code>
+commit e17a50a491851c19158b0908102ea81b1c700564
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Thu Mar 5 16:34:02 2015 -0700
+
+    RingBuffer implementation
+</code>
+</pre>
+<p>
+I use <code>mmap</code> to put the same slice of memory in two places so that
+each write and read from the ring buffer only takes one <code>memcpy</code>.
+</p>
+<pre>
+<code>
+commit f3581e6989e98b8aeddd66d3ad452ec622a713a9
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Sat Mar 7 19:13:58 2015 -0700
+
+    alright C++ you win. gimme dat inheritance
+</code>
+</pre>
+<p>
+When working on widget user interface code, I realized that I was implementing inheritence
+without actually using C++'s inheritance features, and it was more error prone than just
+giving in and depending on libstdc++.
+</p>
+<p>
+The core backend and the GUI are decoupled. The core backend is in a shared
+library called libgenesis which does not link against any GUI-related
+libraries - not even libstdc++.
+</p>
+<p>
+Meanwhile, the GUI depends on libgenesis and puts a user-interface on top of it.
+</p>
+<p>
+libgenesis is intended to be a general-purpose utility library for doing
+digital audio workstation related things, such as using it as the backend for
+a headless computer-created music stream.
+</p>
+<pre>
+<code>
+749f762f34fa6ba207374f8807c1be241810d768
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Tue Mar 10 12:45:51 2015 -0700
+
+    32-bit floats in memory instead of 64
+</code>
+</pre>
+<p>
+I'm still not sure about this one. I've read some conflicting things about whether to
+use 32-bit float or 64-bit float for audio processing.
+</p>
+<p>
+I made this commit when I found out that JACK uses exclusively 32-bit floats for audio
+samples.
+</p>
+<pre>
+<code>
+commit bdaca9bea4fb046cdb7357da7476cb455ab5d5c1
+Author: Andrew Kelley &lt;superjoe30@gmail.com&gt;
+Date:   Tue Mar 10 19:37:00 2015 -0700
+
+    GLFW instead of SDL2
+</code>
+</pre>
+<p>
+I experienced 2 issues with SDL:
+</p>
+<ul>
+  <li><a href="https://github.com/andrewrk/genesis/issues/1">home button doesn't work on some keyboards</a></li>
+  <li><a href="https://github.com/andrewrk/genesis/issues/2">keyboard shortcuts ignore keyboard layout</a></li>
+</ul>
+<p>
+<a href="http://www.glfw.org/">GLFW</a> has a narrower focus and smaller footprint.
+I hoped that this meant the bug surface area would be smaller.
+</p>
+<p>
+Sadly, it has the same bugs. However it is under more active development with a faster release schedule,
+and less bloat in between Genesis and the hardware is nice.
+</p>
+<p>
+Next I got a <code>list_devices</code> example program working:
+</p>
+<pre>
+$ ./list_devices 
+playback device: 44100 Hz GK104 HDMI Audio Controller Digital Stereo (HDMI)
+playback device: 44100 Hz Built-in Audio Analog Stereo (default)
+recording device: 44100 Hz Monitor of GK104 HDMI Audio Controller Digital Stereo (HDMI)
+recording device: 44100 Hz Monitor of Built-in Audio Analog Stereo
+recording device: 44100 Hz Built-in Audio Analog Stereo (default)
+controller device: Midi Through Port-0 (default)
+6 devices found
+</pre>
+<p>
+And a <code>normalize_audio</code> example which reads an audio file of any format,
+increases the volume as much as possible without clipping, and then saves to any format.
+This demonstrates the audio import and export capabilities.
+</p>
+<pre>
+$ ./normalize_audio ~/tmp/quiet.ogg ~/tmp/out.flac
+Channels: 2 (Stereo)
+222208 frames (5.04 seconds)
+Amplification factor: 18.638
+out codec: FLAC (Free Lossless Audio Codec)
+out sample format: signed 24-bit integer
+out sample rate: 44100
+</pre>
