@@ -2,8 +2,9 @@
 
 var StreamSink = require('streamsink');
 var fs = require('fs');
+var path = require('path');
 var diacritics = require('diacritics');
-var spawn = require('child_process');
+var spawn = require('child_process').spawn;
 var MAX_LENGTH = 64;
 
 var postList = require("./post_list.json");
@@ -18,6 +19,13 @@ if (process.argv[4]) throw new Error("extra args");
 
 fs.statSync(input_filename);
 
+var postFileName= "posts/" + output_filename + ".html";
+if (fs.existsSync(postFileName)) {
+  throw new Error("post already exists");
+}
+
+console.error("Enter description and then EOF:");
+
 var sink = new StreamSink();
 sink.on('finish', function() {
   main(sink.toString('utf8'));
@@ -25,14 +33,11 @@ sink.on('finish', function() {
 process.stdin.pipe(sink);
 
 function main(caption) {
-  var args = ["put", "--acl-public", input_filename, "s3://genesisdaw.org/img/" + output_filename + ".png"];
+  var extension = path.extname(input_filename);
+  var args = ["put", "--acl-public", input_filename, "s3://genesisdaw.org/img/" + output_filename + extension];
   exec("./node_modules/.bin/s3-cli", args, function() {
-    var postFileName= "posts/" + output_filename + ".html";
-    if (fs.existsSync(postFileName)) {
-      throw new Error("post already exists");
-    }
     fs.writeFileSync(postFileName,
-      "<img alt=\"\" src=\"https://s3.amazonaws.com/genesisdaw.org/img/" + output_filename + "\">\n" +
+      "<img alt=\"\" src=\"https://s3.amazonaws.com/genesisdaw.org/img/" + output_filename + extension + "\">\n" +
       "<p>" + caption + "</p>\n");
     postList.push({
         "filename": output_filename + ".html",
@@ -41,7 +46,10 @@ function main(caption) {
         "title": title
     });
     fs.writeFileSync("post_list.json", JSON.stringify(postList, null, 2));
-    // TODO: git commit, git push, push
+    exec("./build", [], function() {
+
+      // TODO: git commit, git push, push
+    })
   });
 }
 
@@ -63,7 +71,8 @@ function urlify(str) {
 }
 
 function exec(cmd, args, cb) {
-  var child = spawn(cmd, args);
+  process.stderr.write(cmd + " " + args.join(" "));
+  var child = spawn(cmd, args, {stdio: 'inherit'});
   child.on('error', function(err) {
     throw err;
   });
