@@ -49,6 +49,8 @@ function main(caption) {
     exec("./build", [], function() {
       exec("git", ["add", "-A"], function() {
         exec("git", ["commit", "-m", "add screenshot: " + title], function() {
+          exec("./push", [], function() {
+          });
         });
       });
     })
