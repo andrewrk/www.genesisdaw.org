@@ -11,7 +11,7 @@ var postList = require('./post_list');
 var VIEWS_DIR = "views";
 var BUILD_DIR = "www";
 
-var RSS_MAX_COUNT = 10;
+var RSS_MAX_COUNT = 50;
 
 mkdirp.sync(BUILD_DIR);
 

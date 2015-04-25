@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Vaporware Grand Plans - Genesis Digital Audio Workstation</title>
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+    <link href="/css/shCore.css" rel="stylesheet" type="text/css">
+    <link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    
+<h1><a href="/">Genesis Digital Audio Workstation</a></h1>
+<h2>Vaporware Grand Plans</h2>
+<p>2015 Mar 16</p>
+
+<h3>Real-Time Safety and Multithreading</h3>
+
+<p>
+Most operating systems do not attempt to make any real-time guarantees. This
+means that various operations do not guarantee a maximum bound on how long it
+might take. For example, when you allocate memory, it might be very quick, or
+the kernel might have to do some memory defragmentation and cache invalidation
+to make room for your new segment of memory. Writing to a hard drive might
+cause it to have to warm up and start spinning.
+</p>
+
+<p>
+This can be a disaster if one of these non-bounded operations is in the
+audio rendering pipeline, especially if the latency is low. The buffer of audio
+going to the sound card might empty before it gets filled up, causing a nasty
+audio glitch sound known as a "buffer underrun".
+</p>
+
+<p>
+In general, all syscalls are suspect when it comes to real-time guarantees. The
+careful audio programmer will avoid them all.
+</p>
+
+<p>
+libgenesis meets this criteria with one exception. libgenesis takes advantage
+of hardware concurrency by using one worker thread per CPU core to render
+audio. It carefully uses a lock-free queue data structure to avoid making
+syscalls, but when there is not enough work to do and some threads are sitting
+idly by, those threads need to suspend execution until there is work to do.
+</p>
+
+<p>
+So if there is more work to be done than worker threads, no syscalls are made.
+However, if a worker thread has nothing to do and needs to suspend execution,
+it makes a <code>FUTEX_WAIT</code> syscall, and then is woken up by another worker thread
+making a <code>FUTEX_WAKE</code> syscall.
+</p>
+
+<h3>Compatibility</h3>
+<p>
+libgenesis follows <a href="http://semver.org/">semver</a>. Major version is bumped when
+API or ABI compatibility is broken. Minor version is bumped when new features
+are added. Patch version is bumped only for bug fixes. Until 1.0.0 is released
+no effort is made toward backward compatibility whatsoever.
+</p>
+<p>
+Genesis Audio Studio has an independent version from libgenesis. Major version
+is bumped when a project file will no longer generate the same output audio as
+the previous version. Minor version is bumped when new features are added.
+Patch version is bumped only for bug fixes. Until 1.0.0 is released no effort
+is made toward project files being backward compatible to previous versions.
+</p>
+
+<h3>Coordinates</h3>
+<p>
+Positions in the audio project are in <em>floating point whole notes</em>. This is to
+take into account the fact that the tempo and time signature could change at
+any point in the audio project. You can convert from whole notes to frames by
+calling a utility function which takes into account tempo and time signature
+changes.
+</p>
+
+<h3>Multiplayer and Peer-to-Peer</h3>
+
+<p>
+When a user opens Genesis, there should be a pane which has a set of rooms that
+users can gather in and chat. For example, a lobby. Users can create other
+rooms, perhaps private, to join as well. Users can invite other users to join
+their open project. When a user joins the project, a peer-to-peer connection is
+established so the edits do not go through a third party. Further, if the peers
+are connected via LAN, network speeds will be very fast.
+</p>
+
+<p>
+The server(s) that provide this chat are also peers. Individuals or businesses
+could donate to the server space, similar to being a seeder in a torrent
+situation, by running the server software, adding their node to the pool.
+</p>
+
+<p>
+When two (or more) users are simultaneously working on a project, the playback
+head is not synchronized. The users are free to roam about the project, making
+changes here and there. However, each person will see "where" in the project
+the other person is working, and see the changes that they are making. So it
+would be trivial, for example, for both users to look at a particular bassline,
+both listening to it on loop, albeit at different offsets, while one person
+works on the drums, and the other person works on the bass rhythm.
+</p>
+
+<h3>Plugin Registry and Safety</h3>
+
+<p>
+Plugins must be provided as source code and published to the Genesis registry.
+The Genesis registry will not be a single server, but once again a peer-to-peer
+network. Downloading from the plugin registry will be like downloading a
+torrent. By default Genesis will act as a peer on LANs when other instances of
+Genesis request plugins over the LAN.
+</p>
+
+<p>
+It's not clear how this goal will be accomplished, but we will attempt to build
+a system where these constraints are met:
+</p>
+
+<ul>
+  <li>
+   Plugins are provided as source code that is guaranteed to build on all
+   supported platforms. It's not possible to have a plugin that works on one
+   person's computer and not another.
+  </li>
+  <li>
+   Plugins either have compile-time protection against malicious code and
+   crashes (such as segfaults) or run-time protection.
+  <ul>
+      <li>
+     One idea: instead of one sandboxed process per plugin, have one sandboxed
+     process that runs all the untrusted plugin code; the entire real-time
+     execution path.
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+DRM will never be supported although paid plugins are not out of the question,
+as long as the constraint is met that if a user wants another user to join their
+project, the other user is able to use the plugin with no restrictions.
+</p>
+
+<h3>Project Network</h3>
+
+<p>
+Users could browse published projects and samples on the peer-to-peer network.
+A sample is a rendered project, so if you want to edit the source to the sample
+you always can.
+</p>
+
+<p>
+Publishing a project requires licensing it generously so that it is always safe
+to use projects on the network for any purpose without restriction.
+</p>
+
+<p>
+The network would track downloads and usages so that users can get an idea of
+popularity and quality. Projects would be categorized and tagged and related to
+each other for easy browsing and searchability.
+</p>
+
+<p>
+So, one user might publish some drum samples that they made as projects, one
+project per sample. Another user might use all of them, edit one of them and
+modify the effects, and then create 10 projects which are drum loops using the
+samples. A third user might use 2-3 of these drum loops, edit them to modify
+the tempo, and produce a song with them and publish the song. Yet another user
+might edit the song, produce a remix, and then publish the remix.
+</p>
+
+<p>
+This project, sample, and plugin network should be easily browsable directly
+from the Genesis user interface. It should be very easy to use content from the
+network, and equally easy to publish content <em>to</em> the network. It should almost
+be easier to save it open source than to save it privately.
+</p>
+
+<h3>License</h3>
+<p>
+Genesis is licensed with the Lesser General Public License. A full copy of the
+license text is included in the LICENSE file, but here's a non-normative
+summary:
+</p>
+<p>
+As a user you have access to the source code, and if you are willing to compile
+from source yourself, you can get the software for free.
+</p>
+<p>
+As a company you may freely use the source code in your software; the only
+restriction is that if you modify Genesis source code, you must contribute those
+modifications back to the Genesis project.
+</p>
+
+
+<p>
+<a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a>
+</p>
+
+<p>
+Previous Post: <a href="opening-an-audio-file.html">Opening an Audio File</a>
+</p>
+
+
+<p>
+Next Post: <a href="interesting-commits.html">Interesting Commits</a>
+</p>
+
+
+
+    <script src="/js/shCore.js"></script>
+    <script src="/js/shBrushCpp.js"></script>
+    <script src="/js/shBrushDiff.js"></script>
+    <script>
+         SyntaxHighlighter.all();
+    </script>
+  </body>
+</html>
+

@@ -4,9 +4,18 @@
     <meta charset="utf-8">
     <title>{% block title %}Genesis Digital Audio Workstation{% endblock %}</title>
     <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+    <link href="/css/shCore.css" rel="stylesheet" type="text/css">
+    <link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css">
   </head>
   <body>
     {% block content %}{% endblock %}
+
+    <script src="/js/shCore.js"></script>
+    <script src="/js/shBrushCpp.js"></script>
+    <script src="/js/shBrushDiff.js"></script>
+    <script>
+         SyntaxHighlighter.all();
+    </script>
   </body>
 </html>
 

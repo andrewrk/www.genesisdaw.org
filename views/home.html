@@ -2,15 +2,15 @@
 
 {% block content %}
 <h1>Genesis Digital Audio Workstation</h1>
-<p><a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a></p>
+<p>
+<a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a>
+|
+<a href="/rss.xml">RSS Feed</a>
+|
+<a href="post/{{posts[0].filename}}">First Post</a>
+</p>
 <p>
 Genesis is a work-in-progress digital audio workstation with some ambitious goals: peer-to-peer multiplayer editing, complete plugin safety, and a built-in peer-to-peer community which shares plugins, projects, and samples.
-</p>
-<p>
-Cross platform support is planned, however, currently only Linux is supported.
-</p>
-<p>
-Genesis is not ready for serious users yet. Come back in a few months.
 </p>
 <p>
 This is the development blog.
@@ -18,7 +18,7 @@ This is the development blog.
 <h2>Posts</h2>
 {% for post in posts|reverse %}
   <h3>{{ post.title }}</h3>
-  <p><a href="post/{{post.filename}}"">{{ post.date | date("Y M d") }}</a></p>
+  <p><a href="post/{{post.filename}}">{{ post.date | date("Y M d") }}</a></p>
   {% autoescape false %}
     {{ post.content }}
   {% endautoescape %}

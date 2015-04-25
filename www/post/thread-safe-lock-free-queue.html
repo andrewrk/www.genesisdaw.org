@@ -1,3 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Thread Safe Lock Free Queue Implementation - Genesis Digital Audio Workstation</title>
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml">
+    <link href="/css/shCore.css" rel="stylesheet" type="text/css">
+    <link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    
+<h1><a href="/">Genesis Digital Audio Workstation</a></h1>
+<h2>Thread Safe Lock Free Queue Implementation</h2>
+<p>2015 Mar 27</p>
+
 <p>
 I spent three days in a row working on a many writer, many reader, fixed-size, thread-safe,
 first-in-first-out <strong>lock-free</strong> queue.
@@ -157,3 +172,29 @@ for causing threads to sleep and wake up. Other operating systems have
 similar features, and I will need to create an OS-specific port of this
 data structure for each operating system when the time comes.
 </p>
+
+
+<p>
+<a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a>
+</p>
+
+<p>
+Previous Post: <a href="interesting-commits.html">Interesting Commits</a>
+</p>
+
+
+<p>
+Next Post: <a href="basic-synth-midi-keyboard.html">Milestone: Basic Synth and MIDI Keyboard Support</a>
+</p>
+
+
+
+    <script src="/js/shCore.js"></script>
+    <script src="/js/shBrushCpp.js"></script>
+    <script src="/js/shBrushDiff.js"></script>
+    <script>
+         SyntaxHighlighter.all();
+    </script>
+  </body>
+</html>
+

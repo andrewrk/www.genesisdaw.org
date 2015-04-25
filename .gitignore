@@ -1,2 +1,4 @@
 node_modules/
-www/
+www/index.html
+www/posts/
+www/rss.xml
