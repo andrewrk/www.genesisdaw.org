@@ -1,0 +1,98 @@
+<p>
+The first 16 bytes of every Genesis project file are:
+</p>
+<pre>
+ca2f 5ef5 00d8 ef0b 8074 18d0 e40b 7a4f
+</pre>
+<p>
+I got this from <code>/dev/random</code>.
+This uniquely identifies the file as a Genesis project file. The default file
+extension is <code>.gdaw</code>.
+</p>
+<p>
+After this contains an ordered list of transactions. A <strong>transaction</strong> is a set of
+<strong>edits</strong>. There are 2 types of edits: put and delete.
+</p>
+<p>
+A <strong>put</strong> contains a key and a value, each of which is a variable number of bytes.
+A <strong>delete</strong> contains only a key, which is a variable number of bytes.
+</p>
+
+<p>
+A transaction looks like this:
+</p>
+<table>
+  <tr>
+    <th>Offset</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>uint32be length of transaction in bytes including this field</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>uint32be crc32 of this transaction</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>uint32be number of put edits in this transaction</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>uint32be number of delete edits in this transaction</td>
+  </tr>
+  <tr>
+    <td>16</td>
+    <td>the put edits in this transaction</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>the delete edits in this transaction</td>
+  </tr>
+</table>
+
+<p>
+A put edit looks like:
+</p>
+
+<table>
+  <tr>
+    <th>Offset</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>0</td><td>uint32be key length in bytes</td>
+  </tr>
+  <tr>
+    <td>4</td><td>uint32be value length in bytes</td>
+  </tr>
+  <tr>
+    <td>8</td><td>key bytes</td>
+  </tr>
+  <tr>
+    <td>-</td><td>value bytes</td>
+  </tr>
+</table>
+
+<p>
+A delete edit looks like:
+</p>
+
+<table>
+  <tr>
+    <th>Offset</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>0</td><td>uint32be key length in bytes</td>
+  </tr>
+  <tr>
+    <td>4</td><td>key bytes</td>
+  </tr>
+</table>
+
+<p>
+That's it. To read the file, apply the transactions in order. To update a file,
+append a transaction. Periodically "garbage collect" by creating a new project
+file with a single transaction with all the data, and then atomically rename
+the new project file over the old one.
+</p>
