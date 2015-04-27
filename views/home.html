@@ -16,7 +16,7 @@ Genesis is a work-in-progress digital audio workstation with some ambitious goal
 This is the development blog.
 </p>
 <h2>Posts</h2>
-{% for post in posts|reverse %}
+{% for post in posts %}
   <h3>{{ post.title }}</h3>
   <p><a href="post/{{post.filename}}">{{ post.date | date("Y M d") }}</a></p>
   {% autoescape false %}

@@ -17,7 +17,6 @@ mkdirp.sync(BUILD_DIR);
 
 readPostContentAndGenerateRss();
 
-render("index.html", "home", {posts: postList});
 var prev = null;
 postList.forEach(function(post) {
   if (prev) {
@@ -26,6 +25,7 @@ postList.forEach(function(post) {
   }
   prev = post;
 });
+render("index.html", "home", {posts: postList.concat([]).reverse()});
 postList.forEach(function(post) {
   render(path.join("post", post.filename), "post", {post: post});
 });
