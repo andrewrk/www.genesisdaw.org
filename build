@@ -20,8 +20,8 @@ readPostContentAndGenerateRss();
 var prev = null;
 postList.forEach(function(post) {
   if (prev) {
-    post.next = prev;
-    prev.prev = post;
+    post.prev = prev;
+    prev.next = post;
   }
   prev = post;
 });
