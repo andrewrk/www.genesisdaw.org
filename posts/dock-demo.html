@@ -1,0 +1,63 @@
+<video src="http://s3.amazonaws.com/genesisdaw.org/vid/dock-demo-2015-05-08.ogv" controls="controls">
+<a href="http://s3.amazonaws.com/genesisdaw.org/vid/dock-demo-2015-05-08.ogv">Download Video</a>
+</video>
+<p>
+Now you can drag docks around into any configuration for editing.
+</p>
+<p>
+By the way, here's what the config file looks like so far (it lives in <code>~/.genesis/config</code>).
+</p>
+<pre class="brush: js">
+// Genesis DAW configuration file
+// This config file format is a superset of JSON. See
+// https://github.com/andrewrk/liblaxjson for more details.
+{
+  // your display name
+  user_name: "andy",
+
+  // your user id
+  user_id: "02f6a090170886e5f6eecf1b22bf250527205e779828e1d2c6052ca681ef8985",
+
+  // open this project on startup
+  open_project_id: "908ad8b5f7c0ff2cc22a60c5240a4f475596c3d2193293fe0c192f8bfab08ac0",
+
+  // these perspectives are available for the user to choose from
+  perspectives: [
+    {
+      name: "Default",
+      dock: {
+        dock_type: "Horiz",
+        split_ratio: 0.307832,
+        child_a: {
+          dock_type: "Tabs",
+          tabs: ["Resources"],
+        },
+        child_b: {
+          dock_type: "Tabs",
+          tabs: ["Track Editor", "Mixer"],
+        },
+      },
+    },
+  ],
+
+  // open these windows on startup
+  open_windows: [
+    {
+      // which perspective this window uses
+      perspective: 0,
+
+      // position of the window on the screen
+      left: 243,
+      top: 111,
+      width: 1102,
+      height: 855,
+      maximized: false,
+
+      // whether to show dockable pane tabs when there is only one
+      always_show_tabs: true,
+
+    },
+  ],
+
+}
+</pre>
