@@ -1,0 +1,118 @@
+<video src="http://s3.amazonaws.com/genesisdaw.org/vid/playback-2015-05-27.ogv" controls="controls">
+<a href="http://s3.amazonaws.com/genesisdaw.org/vid/playback-2015-05-27.ogv">Download Video</a>
+</video>
+<p>
+This is another major milestone for the project: we have playback.
+</p>
+<p>
+Lock-free multi-threaded programming is <em>extremely</em> difficult.
+Here are a couple of data structures I implemented to solve some problems:
+</p>
+<pre class="brush: cpp">
+#ifndef ATOMIC_DOUBLE_HPP
+#define ATOMIC_DOUBLE_HPP
+
+#include &lt;atomic&gt;
+
+using std::atomic;
+
+class AtomicDouble {
+public:
+    AtomicDouble() {
+        assert(_value.is_lock_free());
+    }
+
+    void add(double x) {
+        double current_value = _value.load();
+        while (!_value.compare_exchange_weak(current_value, current_value + x)) {}
+    }
+
+    void store(double x) {
+        _value.store(x);
+    }
+
+    double load() const {
+        return _value.load();
+    }
+
+private:
+    atomic&lt;double&gt; _value;
+};
+
+#endif
+</pre>
+<p>
+The play head position uses this to keep track of where is being played.
+</p>
+<pre class="brush: cpp">
+#ifndef ATOMIC_VALUE_HPP
+#define ATOMIC_VALUE_HPP
+
+#include &lt;atomic&gt;
+using std::atomic_int;
+
+#ifndef ATOMIC_INT_LOCK_FREE
+#error "require atomic int to be lock free"
+#endif
+
+// single reader, single writer atomic value
+
+template&lt;typename T&gt;
+class AtomicValue {
+public:
+    AtomicValue() {
+        _in_use_index = 0;
+        _active_index = 0;
+        _write_index = -1;
+    }
+    ~AtomicValue() {}
+
+    T *write_begin() {
+        assert(_write_index == -1);
+        int in_use_index = _in_use_index.load();
+        int active_index = _active_index.load();
+        if (in_use_index != 0 &amp;&amp; active_index != 0)
+            _write_index = 0;
+        else if (in_use_index != 1 &amp;&amp; active_index != 1)
+            _write_index = 1;
+        else
+            _write_index = 2;
+        return &amp;_values[_write_index];
+    }
+
+    void write_end() {
+        assert(_write_index != -1);
+        _active_index.store(_write_index);
+        _write_index = -1;
+    }
+
+    T *get_read_ptr() {
+        _in_use_index.store(_active_index.load());
+        return &amp;_values[_in_use_index];
+    }
+
+    T *write(const T &amp;value) {
+        T *ptr = write_begin();
+        *ptr = value;
+        write_end();
+        return ptr;
+    }
+
+private:
+    T _values[3];
+    atomic_int _in_use_index;
+    atomic_int _active_index;
+    int _write_index;
+
+    AtomicValue(const AtomicValue &amp;copy) = delete;
+    AtomicValue &amp;operator=(const AtomicValue &amp;copy) = delete;
+};
+
+#endif
+</pre>
+<p>
+This structure uses triple buffering to provide a single reader, single writer atomic value, where
+the value can be anything. In Genesis, it is used to hold the data structure that contains all the
+MIDI events. When a user edits the project, the pointer atomically flips to an unused buffer for
+writing, similar to how screen rendering works.
+</p>
