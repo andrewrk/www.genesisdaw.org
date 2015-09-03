@@ -1,0 +1,72 @@
+<p>
+I struggled with buffer underruns for a long time. I seemed to be dealing
+with some enigmatic audio problems.
+</p>
+<p>
+After many failed attempts to solve the audio problems I was having, I decided
+to tackle the problem head on. I extracted the audio engine code and started a
+new project, one in which I was dedicated to becoming an expert at how audio
+input and output is handled on every platform. Hopefully after solving the crap
+out of sound I/O in a way independent from the other issues I was having, I
+would be able to solve the Genesis problems.
+</p>
+<p>
+Well, 3 months and a lot of hard work later I have completed
+<a href="http://libsound.io/">libsoundio 1.0.0</a>.
+</p>
+<p>
+libsoundio is a lightweight abstraction over various sound drivers. It provides a
+well-documented API that operates consistently regardless of the sound driver it
+connects to. It performs no buffering or processing on your behalf; instead exposing
+the raw power of the underlying backend.
+</p>
+<p>
+libsoundio is appropriate for games, music players, digital audio workstations,
+and various utilities.
+</p>
+<p>
+libsoundio is serious about robustness. It even handles
+<a href="https://github.com/andrewrk/malcheck">out of memory conditions</a>
+correctly.
+</p>
+<h3>Features &amp; Limitations</h3>
+<div>
+  <ul>
+    <li>Supported backends:
+      <ul>
+        <li><a href="http://jackaudio.org/">JACK</a></li>
+        <li><a href="http://www.freedesktop.org/wiki/Software/PulseAudio/">PulseAudio</a></li>
+        <li><a href="http://www.alsa-project.org/">ALSA</a></li>
+        <li><a href="https://developer.apple.com/library/mac/documentation/MusicAudio/Conceptual/CoreAudioOverview/Introduction/Introduction.html">CoreAudio</a></li>
+        <li> <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/dd371455%28v=vs.85%29.aspx">WASAPI</a></li>
+        <li>Dummy (silence)</li>
+      </ul>
+    </li>
+    <li>
+    Exposes both raw devices and shared devices. Raw devices give you the best
+    performance but prevent other applications from using them. Shared devices
+    are default and usually provide sample rate conversion and format
+    conversion.
+    </li>
+    <li>
+    Exposes both device id and friendly name. id you could save in a config file
+    because it persists between devices becoming plugged and unplugged, while
+    friendly name is suitable for exposing to users.
+    </li>
+    <li>Supports optimal usage of each supported backend. The same API does the right thing whether the backend has a fixed buffer size, such as on JACK and CoreAudio, or whether it allows directly managing the buffer, such as on ALSA or PulseAudio.</li>
+    <li>C library. Depends only on the respective backend API libraries and libc. Does not depend on libstdc++, and does not have exceptions, run-time type information, or <a href="http://latentcontent.net/2007/12/05/libpng-worst-api-ever/">setjmp</a>.</li>
+    <li>Errors are communicated via return codes, not logging to stdio.</li>
+    <li>Supports channel layouts (also known as channel maps), important for surround sound applications.</li>
+    <li>Ability to monitor devices and get an event when available devices change.</li>
+    <li>Ability to get an event when the backend is disconnected, for example when the JACK server or PulseAudio server shuts down.</li>
+    <li>Detects which input device is default and which output device is default.</li>
+    <li>Ability to connect to multiple backends at once. For example you could have an ALSA device open and a JACK device open at the same time.</li>
+    <li>Meticulously checks all return codes and memory allocations and uses meaningful error codes.</li>
+    <li>
+      Compare libsoundio to:
+      <a href="https://github.com/andrewrk/libsoundio/wiki/libsoundio-vs-PortAudio">PortAudio</a>,
+      <a href="https://github.com/andrewrk/libsoundio/wiki/libsoundio-vs-RtAudio">RtAudio</a>,
+      or <a href="https://github.com/andrewrk/libsoundio/wiki/libsoundio-vs-SDL2">SDL2</a>.
+    </li>
+  </ul>
+</div>
