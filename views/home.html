@@ -3,11 +3,13 @@
 {% block content %}
 <h1><a href="/"><img src="/img/genesis-logo-64.png" style="vertical-align: middle"></a>Genesis Digital Audio Workstation</h1>
 <p>
-<a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a>
+<a href="post/{{posts[posts.length - 1].filename}}">First Post</a>
 |
 <a href="/rss.xml">RSS Feed</a>
 |
-<a href="post/{{posts[posts.length - 1].filename}}">First Post</a>
+<a href="https://github.com/andrewrk/genesis">Genesis on GitHub</a>
+|
+<a href="https://salt.bountysource.com/teams/gdaw">Financial Support</a>
 </p>
 <p>
 Genesis is a work-in-progress digital audio workstation with some ambitious goals: peer-to-peer multiplayer editing, complete plugin safety, and a built-in peer-to-peer community which shares plugins, projects, and samples.
@@ -17,11 +19,13 @@ This is the development blog.
 </p>
 <h2>Posts</h2>
 {% for post in posts %}
-  <h3>{{ post.title }}</h3>
-  <p><a href="post/{{post.filename}}">{{ post.date | date("Y M d") }}</a></p>
-  {% autoescape false %}
-    {{ post.content }}
-  {% endautoescape %}
+  <div class="post">
+    <h3>{{ post.title }}</h3>
+    <h4><a href="post/{{post.filename}}">{{ post.date | date("Y M d") }}</a></h4>
+    {% autoescape false %}
+      {{ post.content }}
+    {% endautoescape %}
+  </div>
 {% endfor %}
 
 {% endblock content %}
