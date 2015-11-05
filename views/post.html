@@ -26,4 +26,20 @@ Next Post: <a href="{{post.next.filename}}">{{ post.next.title }}</a>
 |
 <a href="https://salt.bountysource.com/teams/gdaw">Financial Support</a>
 </p>
+<div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+        this.page.url = "http://genesisdaw.org/post/{{post.filename}}";
+        this.page.identifier = "{{post.filename}}";
+    };
+
+    (function() {
+        var d = document, s = d.createElement('script');
+
+        s.src = '//genesisdaw.disqus.com/embed.js';
+
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
 {% endblock %}

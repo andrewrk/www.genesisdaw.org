@@ -25,6 +25,7 @@ This is the development blog.
     {% autoescape false %}
       {{ post.content }}
     {% endautoescape %}
+    <p><a href="post/{{post.filename}}">View Comments</a></p>
   </div>
 {% endfor %}
 
